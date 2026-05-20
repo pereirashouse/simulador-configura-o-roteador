@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP-Link - Simulador de Configuração</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: #42b9f5;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Layout Principal */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 60px);
+        }
+
+        /* Menu Lateral */
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            padding: 15px 20px;
+            border-bottom: 1px solid #34495e;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .sidebar ul li:hover, .sidebar ul li.active {
+            background-color: #42b9f5;
+        }
+
+        /* Área de Conteúdo */
+        .content {
+            flex: 1;
+            padding: 30px;
+            background-color: #fff;
+        }
+
+        .panel {
+            display: none;
+            max-width: 600px;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .panel h2 {
+            border-bottom: 2px solid #42b9f5;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            width: 180px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"], 
+        .form-group select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        button.save-btn {
+            background-color: #42b9f5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        button.save-btn:hover {
+            background-color: #3198cf;
+        }
+
+        /* Mensagem de sucesso */
+        .alert {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TP-Link</h1>
+        <div>admin | Sair</div>
+    </header>
+
+    <div class="container">
+        <!-- Menu Lateral -->
+        <div class="sidebar">
+            <ul>
+                <li onclick="showPanel('status')">Status</li>
+                <li onclick="showPanel('wifi24')" class="active" id="tab-wifi24">Wireless 2.4GHz</li>
+                <li onclick="showPanel('wifi5')" id="tab-wifi5">Wireless 5GHz</li>
+                <li onclick="showPanel('qos')" id="tab-qos">QoS</li>
+                <li onclick="showPanel('system')">Ferramentas do Sistema</li>
+            </ul>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="content">
+            <div id="alert-msg" class="alert">Configurações salvas com sucesso!</div>
+
+            <!-- Painel Wireless 2.4GHz -->
+            <div id="wifi24" class="panel active">
+                <h2>Configurações Wireless - 2.4GHz</h2>
+                <div class="form-group">
+                    <label>Habilitar Rádio:</label>
+                    <input type="checkbox" checked> Habilitar
+                </div>
+                <div class="form-group">
+                    <label>Nome da Rede (SSID):</label>
+                    <input type="text" value="MinhaRede_2G">
+                </div>
+                <div class="form-group">
+                    <label>Canal:</label>
+                    <select>
+                        <option value="auto">Auto</option>
+                        <option value="1">1</option>
+                        <option value="6" selected>6</option>
+                        <option value="11">11</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Largura do Canal:</label>
+                    <select>
+                        <option value="auto">Auto</option>
+                        <option value="20">20MHz</option>
+                        <option value="40" selected>40MHz</option>
+                    </select>
+                </div>
+                <button class="save-btn" onclick="saveConfig()">Salvar</button>
+            </div>
+
+            <!-- Painel Wireless 5GHz -->
+            <div id="wifi5" class="panel">
+                <h2>Configurações Wireless - 5GHz</h2>
+                <div class="form-group">
+                    <label>Habilitar Rádio:</label>
+                    <input type="checkbox" checked> Habilitar
+                </div>
+                <div class="form-group">
+                    <label>Nome da Rede (SSID):</label>
+                    <input type="text" value="MinhaRede_5G">
+                </div>
+                <div class="form-group">
+                    <label>Canal:</label>
+                    <select>
+                        <option value="auto">Auto</option>
+                        <option value="36">36</option>
+                        <option value="40">40</option>
+                        <option value="44">44</option>
+                        <option value="149" selected>149</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Largura do Canal:</label>
+                    <select>
+                        <option value="auto">Auto</option>
+                        <option value="20">20MHz</option>
+                        <option value="40">40MHz</option>
+                        <option value="80" selected>80MHz</option>
+                    </select>
+                </div>
+                <button class="save-btn" onclick="saveConfig()">Salvar</button>
+            </div>
+
+            <!-- Painel QoS -->
+            <div id="qos" class="panel">
+                <h2>Configuração de QoS (Quality of Service)</h2>
+                <div class="form-group">
+                    <label>Habilitar QoS:</label>
+                    <input type="checkbox" id="enableQos" onclick="toggleQos()"> Habilitar Controle de Banda
+                </div>
+                <div id="qosSettings" style="display: none;">
+                    <div class="form-group">
+                        <label>Tipo de Linha:</label>
+                        <select>
+                            <option>ADSL</option>
+                            <option selected>Fibra/Cabo</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Banda de Upload (Kbps):</label>
+                        <input type="text" value="50000">
+                    </div>
+                    <div class="form-group">
+                        <label>Banda de Download (Kbps):</label>
+                        <input type="text" value="200000">
+                    </div>
+                </div>
+                <button class="save-btn" onclick="saveConfig()">Salvar</button>
+            </div>
+
+            <!-- Painéis Genéricos para preenchimento de layout -->
+            <div id="status" class="panel">
+                <h2>Status do Roteador</h2>
+                <p>Aqui seriam exibidas as informações de firmware, uptime e status da WAN.</p>
+            </div>
+            <div id="system" class="panel">
+                <h2>Ferramentas do Sistema</h2>
+                <p>Opções de backup, atualização de firmware e log de eventos.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Função para alternar as abas
+        function showPanel(panelId) {
+            // Esconde todos os painéis
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Remove classe ativa de todos os itens do menu
+            document.querySelectorAll('.sidebar ul li').forEach(li => {
+                li.classList.remove('active');
+            });
+
+            // Mostra o painel selecionado
+            document.getElementById(panelId).classList.add('active');
+            
+            // Se o item clicado tiver ID (para as abas principais), marca como ativo
+            if(document.getElementById('tab-' + panelId)) {
+                document.getElementById('tab-' + panelId).classList.add('active');
+            }
+            
+            // Esconde alertas anteriores ao trocar de aba
+            document.getElementById('alert-msg').style.display = 'none';
+        }
+
+        // Simula o comportamento de ativar/desativar os campos do QoS
+        function toggleQos() {
+            var qosSettings = document.getElementById('qosSettings');
+            var isEnabled = document.getElementById('enableQos').checked;
+            qosSettings.style.display = isEnabled ? 'block' : 'none';
+        }
+
+        // Simula o salvamento das configurações
+        function saveConfig() {
+            var alertMsg = document.getElementById('alert-msg');
+            alertMsg.style.display = 'block';
+            
+            // Oculta a mensagem após 3 segundos
+            setTimeout(function() {
+                alertMsg.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
