@@ -18,9 +18,51 @@
             color: #333;
         }
 
+        :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+            outline: 3px solid #111;
+            outline-offset: 3px;
+            box-shadow: 0 0 0 3px #fff;
+        }
+
+        #painel-atual:focus, #ch-heading:focus, #ch-title:focus {
+            outline: 3px solid #111;
+            outline-offset: 3px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .skip-link {
+            position: fixed;
+            top: 8px;
+            left: 8px;
+            transform: translateY(-200%);
+            z-index: 10;
+            padding: 12px;
+            color: #075b84;
+            background: #fff;
+        }
+
+        .skip-link:focus {
+            transform: none;
+        }
+
+        input[aria-invalid="true"] {
+            border: 2px solid #721c24;
+        }
+
         /* Cabeçalho */
         header {
-            background-color: #42b9f5;
+            background-color: #075b84;
             color: white;
             padding: 15px 30px;
             display: flex;
@@ -32,6 +74,7 @@
         header h1 {
             font-size: 24px;
             font-weight: bold;
+            overflow-wrap: anywhere;
         }
 
         /* Layout Principal */
@@ -67,7 +110,7 @@
         }
 
         .sidebar ul li button:hover, .sidebar ul li button.active {
-            background-color: #42b9f5;
+            background-color: #075b84;
         }
 
         .sidebar ul li button:focus-visible {
@@ -101,7 +144,7 @@
         }
 
         .panel h2 {
-            border-bottom: 2px solid #42b9f5;
+            border-bottom: 2px solid #075b84;
             padding-bottom: 10px;
             margin-bottom: 20px;
             color: #2c3e50;
@@ -139,7 +182,7 @@
             flex: 1;
             min-width: 0;
             padding: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #767676;
             border-radius: 4px;
         }
 
@@ -152,7 +195,7 @@
         }
 
         button.save-btn, button.check-btn {
-            background-color: #42b9f5;
+            background-color: #075b84;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -163,7 +206,7 @@
         }
 
         button.save-btn:hover, button.check-btn:hover {
-            background-color: #3198cf;
+            background-color: #06476a;
         }
 
         /* Mensagem de sucesso */
@@ -262,7 +305,7 @@
             display: block;
             height: 100%;
             width: 0;
-            background: #2e9e5b;
+            background: #246e40;
             transition: width 0.3s;
         }
 
@@ -277,7 +320,7 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            border: 2px solid #42b9f5;
+            border: 2px solid #075b84;
             background: #fff;
             color: #2c3e50;
             font-weight: bold;
@@ -285,17 +328,17 @@
         }
 
         .ch-tabs button.current {
-            background: #42b9f5;
+            background: #075b84;
             color: #fff;
         }
 
         .ch-tabs button.done {
-            border-color: #2e9e5b;
+            border-color: #246e40;
             background: #e3f4ea;
         }
 
         .ch-tabs button.done.current {
-            background: #2e9e5b;
+            background: #246e40;
             color: #fff;
         }
 
@@ -303,7 +346,7 @@
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            color: #3198cf;
+            color: #06476a;
             font-weight: bold;
         }
 
@@ -339,7 +382,7 @@
 
         details.hint summary {
             cursor: pointer;
-            color: #3198cf;
+            color: #06476a;
             font-weight: bold;
         }
 
@@ -378,7 +421,7 @@
             width: 100%;
             min-height: 80px;
             padding: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid #767676;
             border-radius: 4px;
             font-size: 14px;
             margin: 6px 0 8px;
@@ -394,7 +437,7 @@
         .link-btn {
             background: none;
             border: none;
-            color: #3198cf;
+            color: #06476a;
             cursor: pointer;
             font-size: 14px;
             text-decoration: underline;
@@ -436,6 +479,10 @@
         @media (max-width: 1100px) {
             .content {
                 flex-direction: column;
+            }
+
+            .main {
+                width: 100%;
             }
 
             .challenges {
@@ -483,7 +530,7 @@
             }
 
             .form-group label {
-                width: auto;
+            width: auto;
             }
 
             .form-group:has(input[type="checkbox"]) {
@@ -496,12 +543,23 @@
                 width: 100%;
             }
         }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <a class="skip-link" href="#painel-atual">Pular para configurações</a>
+    <a class="skip-link" href="#ch-heading">Pular para desafios</a>
+    <div id="interaction-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
     <header>
-        <h1>TP-Link</h1>
+        <h1>Simulador de roteador</h1>
         <div>Modo simulação</div>
     </header>
 
@@ -514,19 +572,19 @@
         <!-- Menu Lateral -->
         <nav class="sidebar" aria-label="Menu do roteador">
             <ul>
-                <li><button type="button" onclick="showPanel('inicio')" class="active" id="tab-inicio">Início</button></li>
-                <li><button type="button" onclick="showPanel('status')" id="tab-status">Status</button></li>
-                <li><button type="button" onclick="showPanel('wifi24')" id="tab-wifi24">Wireless 2.4GHz</button></li>
-                <li><button type="button" onclick="showPanel('wifi5')" id="tab-wifi5">Wireless 5GHz</button></li>
-                <li><button type="button" onclick="showPanel('qos')" id="tab-qos">QoS</button></li>
-                <li><button type="button" onclick="showPanel('system')" id="tab-system">Ferramentas do Sistema</button></li>
+                <li><button type="button" onclick="showPanel('inicio')" class="active" id="tab-inicio" aria-controls="inicio" aria-pressed="true">Início</button></li>
+                <li><button type="button" onclick="showPanel('status')" id="tab-status" aria-controls="status" aria-pressed="false">Status</button></li>
+                <li><button type="button" onclick="showPanel('wifi24')" id="tab-wifi24" aria-controls="wifi24" aria-pressed="false">Wireless 2.4GHz</button></li>
+                <li><button type="button" onclick="showPanel('wifi5')" id="tab-wifi5" aria-controls="wifi5" aria-pressed="false">Wireless 5GHz</button></li>
+                <li><button type="button" onclick="showPanel('qos')" id="tab-qos" aria-controls="qos" aria-pressed="false">QoS</button></li>
+                <li><button type="button" onclick="showPanel('system')" id="tab-system" aria-controls="system" aria-pressed="false">Ferramentas do Sistema</button></li>
             </ul>
         </nav>
 
         <!-- Conteúdo -->
         <div class="content">
-            <main class="main">
-                <div id="alert-msg" class="alert" role="status" aria-live="polite"></div>
+            <main class="main" id="painel-atual" tabindex="-1" aria-label="Configurações do roteador simulado">
+                <div id="alert-msg" class="alert"></div>
 
                 <!-- Painel de apresentação -->
                 <div id="inicio" class="panel active">
@@ -562,24 +620,28 @@
                 <!-- Painel Status -->
                 <div id="status" class="panel">
                     <h2>Status do Roteador</h2>
-                    <div class="table-wrap">
-                        <table class="info">
-                            <tr><th>Firmware</th><td>3.16.9 Build 20260410 (simulado)</td></tr>
-                            <tr><th>Tempo ligado</th><td>12 dias, 04:31:07</td></tr>
-                            <tr><th>WAN</th><td>Conectado — IP 203.0.113.25 (endereço de documentação)</td></tr>
-                            <tr><th>Plano contratado</th><td>Fibra 100 Mbps de download / 20 Mbps de upload</td></tr>
-                            <tr><th>Clientes conectados</th><td>2,4 GHz: 14 &nbsp;|&nbsp; 5 GHz: 9</td></tr>
+                    <div class="table-wrap" tabindex="0" role="region" aria-label="Tabela de dados do roteador">
+                        <table class="info" aria-label="Dados do roteador simulado">
+                            <tbody>
+                                <tr><th scope="row">Firmware</th><td>3.16.9 Build 20260410 (simulado)</td></tr>
+                                <tr><th scope="row">Tempo ligado</th><td>12 dias, 04:31:07</td></tr>
+                                <tr><th scope="row">WAN</th><td>Conectado — IP 203.0.113.25 (endereço de documentação)</td></tr>
+                                <tr><th scope="row">Plano contratado</th><td>Fibra 100 Mbps de download / 20 Mbps de upload</td></tr>
+                                <tr><th scope="row">Clientes conectados</th><td>2,4 GHz: 14 &nbsp;|&nbsp; 5 GHz: 9</td></tr>
+                            </tbody>
                         </table>
                     </div>
 
                     <h3>Redes vizinhas detectadas (2,4 GHz)</h3>
                     <p>Resultado da última varredura de rádio feita pelo roteador.</p>
-                    <div class="table-wrap">
-                        <table class="info">
-                            <tr><th>Canal</th><th>Redes vizinhas</th><th>Sinal mais forte</th></tr>
-                            <tr><td>1</td><td>5</td><td>-48 dBm (forte)</td></tr>
-                            <tr><td>6</td><td>4</td><td>-52 dBm (forte)</td></tr>
-                            <tr><td>11</td><td>1</td><td>-86 dBm (muito fraco)</td></tr>
+                    <div class="table-wrap" tabindex="0" role="region" aria-label="Tabela de redes vizinhas">
+                        <table class="info" aria-label="Varredura fictícia de redes Wi-Fi">
+                            <thead><tr><th scope="col">Canal</th><th scope="col">Redes vizinhas</th><th scope="col">Sinal mais forte</th></tr></thead>
+                            <tbody>
+                                <tr><td>1</td><td>5</td><td>-48 dBm (forte)</td></tr>
+                                <tr><td>6</td><td>4</td><td>-52 dBm (forte)</td></tr>
+                                <tr><td>11</td><td>1</td><td>-86 dBm (muito fraco)</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -730,7 +792,7 @@
                     <h2>Ferramentas do Sistema</h2>
                     <p>Backup, atualização de firmware e reinicialização ficam desativados no simulador.</p>
                     <h3>Log de eventos</h3>
-                    <pre class="log" tabindex="0" aria-label="Log de eventos do roteador">2026-10-20 07:58:02  INFO  DHCP: endereço 192.168.0.112 entregue a 3c:91:80:2a:11:07
+                    <pre class="log" tabindex="0" role="region" aria-label="Log de eventos do roteador">2026-10-20 07:58:02  INFO  DHCP: endereço 192.168.0.112 entregue a 3c:91:80:2a:11:07
 2026-10-20 07:58:40  INFO  WLAN 2.4G: 3c:91:80:2a:11:07 associado
 2026-10-20 08:14:05  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
 2026-10-20 08:14:09  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
@@ -748,11 +810,11 @@
 
             <!-- Quadro de desafios -->
             <aside class="challenges" aria-labelledby="ch-heading">
-                <h2 id="ch-heading">Desafios</h2>
+                <h2 id="ch-heading" tabindex="-1">Desafios</h2>
                 <p class="progress-text" id="progress-text">0 de 6 concluídos</p>
                 <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
                 <div class="ch-tabs" id="ch-tabs" role="group" aria-label="Escolher desafio"></div>
-                <div id="ch-card" aria-live="polite"></div>
+                <div id="ch-card"></div>
                 <p style="margin-top:14px"><button type="button" class="link-btn" onclick="resetAll()">Recomeçar tudo</button></p>
             </aside>
         </div>
@@ -760,6 +822,15 @@
 
     <script>
         // ------------------------------------------------------------ painéis do roteador
+
+        // Região estável: não anuncia novamente todos os controles do desafio.
+        var announcementTimer;
+        function announce(message) {
+            var status = document.getElementById('interaction-status');
+            clearTimeout(announcementTimer);
+            status.textContent = '';
+            announcementTimer = setTimeout(function() { status.textContent = message; }, 0);
+        }
 
         // Função para alternar as abas
         function showPanel(panelId) {
@@ -771,14 +842,17 @@
             // Remove classe ativa de todos os itens do menu
             document.querySelectorAll('.sidebar ul li button').forEach(btn => {
                 btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
             });
 
             // Mostra o painel selecionado e marca o item do menu
             document.getElementById(panelId).classList.add('active');
             document.getElementById('tab-' + panelId).classList.add('active');
+            document.getElementById('tab-' + panelId).setAttribute('aria-pressed', 'true');
 
             // Esconde alertas anteriores ao trocar de aba
             document.getElementById('alert-msg').style.display = 'none';
+            announce('Painel: ' + document.querySelector('#' + panelId + ' h2').textContent + '.');
         }
 
         // Simula o comportamento de ativar/desativar os campos do QoS
@@ -801,10 +875,10 @@
                 var label = inputs[i].parentNode.querySelector('label').textContent.replace(':', '');
                 var value = inputs[i].value.trim();
                 if (inputs[i].offsetParent === null || inputs[i].disabled) continue; // campo oculto ou desativado
-                if (value === '') return 'Preencha o campo "' + label + '".';
-                if (label.indexOf('SSID') !== -1 && value.length > 32) return 'O SSID pode ter no máximo 32 caracteres.';
-                if (label.indexOf('Senha') !== -1 && (value.length < 8 || value.length > 63)) return 'A senha do Wi-Fi precisa ter de 8 a 63 caracteres.';
-                if (label.indexOf('Kbps') !== -1 && !/^[0-9]+$/.test(value)) return 'O campo "' + label + '" aceita apenas números inteiros.';
+                if (value === '') return { field: inputs[i], message: 'Preencha o campo "' + label + '".' };
+                if (label.indexOf('SSID') !== -1 && value.length > 32) return { field: inputs[i], message: 'O SSID pode ter no máximo 32 caracteres.' };
+                if (label.indexOf('Senha') !== -1 && (value.length < 8 || value.length > 63)) return { field: inputs[i], message: 'A senha do Wi-Fi precisa ter de 8 a 63 caracteres.' };
+                if (label.indexOf('Kbps') !== -1 && !/^[0-9]+$/.test(value)) return { field: inputs[i], message: 'O campo "' + label + '" aceita apenas números inteiros.' };
             }
             return null;
         }
@@ -825,23 +899,26 @@
         });
 
         // Simula o salvamento: a mensagem só aparece depois de clicar em Salvar
-        var alertTimer;
         function saveConfig(button) {
             var panel = button.closest('.panel');
             var alertMsg = document.getElementById('alert-msg');
             var error = validatePanel(panel);
+            document.querySelectorAll('.panel [aria-invalid]').forEach(function(input) {
+                input.removeAttribute('aria-invalid');
+                if (input.getAttribute('aria-describedby') === 'alert-msg') input.removeAttribute('aria-describedby');
+            });
             alertMsg.className = error ? 'alert error' : 'alert';
-            alertMsg.textContent = error || 'Configurações aplicadas no simulador. Nenhum equipamento real foi alterado.';
+            alertMsg.textContent = error ? error.message : 'Configurações aplicadas no simulador. Nenhum equipamento real foi alterado.';
             alertMsg.style.display = 'block';
-            if (!error) saved[panel.id] = readPanel(panel);
-
-            clearTimeout(alertTimer);
-            if (!error) {
-                // Oculta a mensagem de sucesso após 3 segundos
-                alertTimer = setTimeout(function() {
-                    alertMsg.style.display = 'none';
-                }, 3000);
+            if (error) {
+                error.field.setAttribute('aria-invalid', 'true');
+                error.field.setAttribute('aria-describedby', 'alert-msg');
+                error.field.focus();
+            } else {
+                saved[panel.id] = readPanel(panel);
+                announce(alertMsg.textContent);
             }
+            // A confirmação permanece até outra ação; não exige leitura em 3 segundos.
         }
 
         // Painéis alterados na tela mas ainda não salvos
@@ -1089,33 +1166,38 @@
 
         function renderTabs() {
             var tabs = document.getElementById('ch-tabs');
-            tabs.innerHTML = '';
             challenges.forEach(function(ch, i) {
-                var b = document.createElement('button');
-                b.type = 'button';
+                var b = tabs.children[i];
+                if (!b) {
+                    b = document.createElement('button');
+                    b.type = 'button';
+                    b.setAttribute('aria-controls', 'ch-card');
+                    b.onclick = function() { current = i; render(true); };
+                    tabs.appendChild(b);
+                }
                 b.textContent = done.indexOf(i) !== -1 ? '✓' : String(i + 1);
                 b.className = (i === current ? 'current ' : '') + (done.indexOf(i) !== -1 ? 'done' : '');
                 b.setAttribute('aria-label', 'Desafio ' + (i + 1) + ': ' + ch.title + (done.indexOf(i) !== -1 ? ' (concluído)' : ''));
                 if (i === current) b.setAttribute('aria-current', 'step');
-                b.onclick = function() { current = i; render(); };
-                tabs.appendChild(b);
+                else b.removeAttribute('aria-current');
             });
             var n = done.length;
             document.getElementById('progress-text').textContent = n + ' de ' + challenges.length + ' concluídos';
             document.getElementById('progress-bar').style.width = (100 * n / challenges.length) + '%';
         }
 
-        function render() {
+        function render(announceChange) {
             var ch = challenges[current];
             document.getElementById('ch-card').innerHTML =
                 '<div class="ch-level">Desafio ' + (current + 1) + ' de ' + challenges.length + ' · ' + ch.level + '</div>' +
-                '<h3 class="ch-title">' + ch.title + '</h3>' +
+                '<h3 class="ch-title" id="ch-title" tabindex="-1">' + ch.title + '</h3>' +
                 '<div class="ch-body">' + ch.body + '</div>' +
                 '<details class="hint"><summary>Ver dica</summary><p>' + ch.hint + '</p></details>' +
-                '<div class="ch-actions"><button type="button" class="check-btn" onclick="verify()">Verificar</button></div>' +
+                '<div class="ch-actions"><button type="button" class="check-btn" aria-controls="feedback" onclick="verify()">Verificar</button></div>' +
                 '<div class="feedback" id="feedback"></div>';
             if (ch.render) ch.render();
             renderTabs();
+            if (announceChange) announce('Desafio ' + (current + 1) + ' de ' + challenges.length + ': ' + ch.title + '.');
         }
 
         function verify() {
@@ -1138,12 +1220,18 @@
                 fb.className = 'feedback no';
                 fb.innerHTML = '<p><strong>Ainda não.</strong> Veja o que falta:</p><ul><li>' + result.errors.join('</li><li>') + '</li></ul>' + note;
             }
+            var message = result.ok ? 'Certo! Desafio ' + (current + 1) + ' concluído. ' + document.getElementById('progress-text').textContent + '. Consulte a explicação no feedback.'
+                : 'Ainda não. ' + Array.from(fb.querySelectorAll('li')).map(function(li) { return li.textContent; }).join(' ');
+            if (pending.length) message += ' Atenção: há alterações não salvas em ' + pending.join(' e ') + '.';
+            announce(message);
         }
 
         function goTo(i) {
             current = i;
             render();
-            document.getElementById('ch-heading').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            var heading = document.getElementById('ch-title');
+            heading.focus();
+            heading.scrollIntoView({ block: 'nearest' });
         }
 
         function resetAll() {
