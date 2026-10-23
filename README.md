@@ -60,11 +60,38 @@ Cada resposta errada tem um feedback próprio. Exemplos: escolher o canal 1 most
 
 ## Como executar
 
-Abra `index.html` em qualquer navegador. Não há dependências nem servidor e funciona sem internet, o que ajuda em laboratórios com conexão ruim.
+Abra `index.html` em qualquer navegador. Para usar a atividade, não há dependências nem servidor e ela funciona sem internet. Node.js, pnpm e Playwright são necessários apenas para desenvolver/executar os testes abaixo, não para alunos utilizarem o HTML.
 
 ## Tecnologias
 
 HTML, CSS e JavaScript puro, em um único arquivo.
+
+## Testes de interface
+
+A suíte em `tests/interface.spec.cjs` usa Playwright e Chromium real, em dois contextos de tela: computador (1280 × 800) e celular emulado (390 × 844). Cada cenário começa em um contexto isolado, sem dados de alunos, e não depende da ordem dos testes. A atividade testada é o próprio `index.html`; o servidor de teste é local, somente leitura, e nenhuma requisição da página pode sair do laboratório.
+
+| Cobertura | O que é conferido |
+|---|---|
+| Percurso didático | Feedback inicial de cada desafio e conclusão dos seis pelo fluxo de botões, formulários e questionários |
+| Configuração e retorno | Salvar versus Verificar, alterações não salvas, SSID/senha inválidos, segurança nas duas faixas e QoS incompatível com o plano |
+| Progresso | Acerto repetido sem duplicação, recarregamento, reset confirmado/cancelado, JSON malformado e armazenamento bloqueado |
+| Operação local | Abertura do arquivo com o navegador offline, ativação básica por teclado, ausência de erros JavaScript não tratados e de requisições externas |
+
+Os testes não preenchem variáveis internas como `saved`, `done` ou resultados de `check()`: o percurso interage com os controles reais. A leitura do armazenamento verifica apenas a marcação produzida pela interface. As únicas falhas induzidas são no armazenamento local para exercitar os tratamentos existentes.
+
+Com **Node.js 22 ou superior** e **pnpm 11.25.0** disponíveis, execute na pasta do repositório:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium
+pnpm test
+```
+
+A primeira instalação de dependências/Chromium precisa de internet. Se faltarem bibliotecas do sistema no Linux, use `pnpm exec playwright install --with-deps chromium`. A execução sobe e encerra seu servidor de testes em `127.0.0.1:4173`; libere essa porta antes de iniciar. Não reutiliza outro servidor que já esteja em execução.
+
+O relatório HTML fica em `playwright-report/` e pode ser aberto com `pnpm test:report`. Rastros e capturas são gerados apenas quando um teste falha; dependências e resultados locais ficam fora do Git. O [workflow de interface](https://github.com/pereirashouse/simulador-configura-o-roteador/actions/workflows/testes-interface.yml) executa a suíte em pushes/PRs da `main`, com lockfile, ações fixadas por commit, duas telas e **zero retentativas**. Os artefatos do relatório ficam disponíveis por sete dias. Consulte a execução e seu commit para a evidência atual; um workflow configurado não é, sozinho, um resultado aprovado.
+
+**Limites:** Chromium e telas emuladas não equivalem a Safari/Firefox, aparelhos físicos ou leitores de tela. A ativação básica por teclado não é auditoria de acessibilidade, contraste ou WCAG. O teste do texto livre confirma o limite atual de 40 caracteres, não sua qualidade semântica. A suíte exercita o artefato local, não disponibilidade do GitHub Pages, funcionamento de equipamentos ou aprendizagem em turma. O código da atividade não precisa ser recompilado nem empacotado para continuar funcionando offline.
 
 ## Limitações
 

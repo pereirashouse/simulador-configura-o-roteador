@@ -1,0 +1,3 @@
+# As dependências de teste não precisam de scripts de instalação.
+# A instalação do Chromium é um comando explícito documentado no README/CI.
+allowBuilds: {}
