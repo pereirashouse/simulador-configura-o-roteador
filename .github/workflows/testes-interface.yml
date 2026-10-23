@@ -1,0 +1,46 @@
+name: Testes de interface
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: interface-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromium:
+    name: Chromium - computador e celular
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Obter o código
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Preparar Node.js 22
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: '22'
+      - name: Preparar o pnpm fixado em package.json
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+      - name: Instalar dependências fixadas
+        run: pnpm install --frozen-lockfile
+      - name: Instalar Chromium e bibliotecas do sistema
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Executar os testes de interface
+        run: pnpm test
+      - name: Guardar relatório e rastros de falhas
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: relatorio-interface
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+          if-no-files-found: warn
