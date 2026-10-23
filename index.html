@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador educacional de configuração de roteador</title>
+    <meta name="description" content="Simulador educacional de roteador Wi-Fi com desafios: alcance na 2,4 GHz, canais, segurança, QoS, log de eventos e diferença entre 2,4 GHz e 5 GHz.">
     <style>
         * {
             margin: 0;
@@ -42,6 +43,7 @@
         /* Menu Lateral */
         .sidebar {
             width: 250px;
+            flex-shrink: 0;
             background-color: #2c3e50;
             color: white;
         }
@@ -50,22 +52,43 @@
             list-style: none;
         }
 
-        .sidebar ul li {
+        .sidebar ul li button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 15px;
             padding: 15px 20px;
             border-bottom: 1px solid #34495e;
             cursor: pointer;
             transition: background 0.3s;
         }
 
-        .sidebar ul li:hover, .sidebar ul li.active {
+        .sidebar ul li button:hover, .sidebar ul li button.active {
             background-color: #42b9f5;
+        }
+
+        .sidebar ul li button:focus-visible {
+            outline: 3px solid #ffd54f;
+            outline-offset: -3px;
         }
 
         /* Área de Conteúdo */
         .content {
             flex: 1;
+            min-width: 0;
             padding: 30px;
             background-color: #fff;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
         }
 
         .panel {
@@ -84,6 +107,20 @@
             color: #2c3e50;
         }
 
+        .panel h3 {
+            color: #2c3e50;
+            margin: 20px 0 8px;
+            font-size: 16px;
+        }
+
+        .panel p, .panel li {
+            line-height: 1.5;
+        }
+
+        .panel ul, .panel ol {
+            padding-left: 22px;
+        }
+
         /* Formulários */
         .form-group {
             margin-bottom: 20px;
@@ -93,22 +130,28 @@
 
         .form-group label {
             width: 180px;
+            flex-shrink: 0;
             font-weight: bold;
         }
 
-        .form-group input[type="text"], 
+        .form-group input[type="text"],
         .form-group select {
             flex: 1;
+            min-width: 0;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
+        }
+
+        .form-group input[type="text"]:disabled {
+            background: #eee;
         }
 
         .form-group input[type="checkbox"] {
             margin-right: 10px;
         }
 
-        button.save-btn {
+        button.save-btn, button.check-btn {
             background-color: #42b9f5;
             color: white;
             border: none;
@@ -119,7 +162,7 @@
             transition: background 0.3s;
         }
 
-        button.save-btn:hover {
+        button.save-btn:hover, button.check-btn:hover {
             background-color: #3198cf;
         }
 
@@ -149,6 +192,310 @@
             font-size: 14px;
             line-height: 1.4;
         }
+
+        /* Tabelas e log */
+        table.info {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        table.info th, table.info td {
+            border: 1px solid #ddd;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        table.info th {
+            background: #f0f6fa;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        pre.log {
+            background: #1e2a36;
+            color: #d6e2ec;
+            padding: 12px;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        /* Desafios */
+        .challenges {
+            width: 360px;
+            flex-shrink: 0;
+            border: 1px solid #cfe3ef;
+            border-radius: 6px;
+            background: #f7fbfd;
+            padding: 18px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .challenges h2 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .progress {
+            height: 8px;
+            background: #dde8ef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .progress span {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: #2e9e5b;
+            transition: width 0.3s;
+        }
+
+        .ch-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .ch-tabs button {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid #42b9f5;
+            background: #fff;
+            color: #2c3e50;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .ch-tabs button.current {
+            background: #42b9f5;
+            color: #fff;
+        }
+
+        .ch-tabs button.done {
+            border-color: #2e9e5b;
+            background: #e3f4ea;
+        }
+
+        .ch-tabs button.done.current {
+            background: #2e9e5b;
+            color: #fff;
+        }
+
+        .ch-level {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #3198cf;
+            font-weight: bold;
+        }
+
+        .ch-title {
+            font-size: 17px;
+            margin: 4px 0 10px;
+            color: #2c3e50;
+        }
+
+        .ch-body p, .ch-body li {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ch-body p {
+            margin-bottom: 8px;
+        }
+
+        .ch-body ul {
+            padding-left: 20px;
+            margin-bottom: 8px;
+        }
+
+        .ch-where {
+            font-size: 13px;
+            color: #555;
+        }
+
+        details.hint {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        details.hint summary {
+            cursor: pointer;
+            color: #3198cf;
+            font-weight: bold;
+        }
+
+        details.hint p {
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .quiz fieldset {
+            border: 1px solid #dde8ef;
+            border-radius: 4px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .quiz legend {
+            font-weight: bold;
+            padding: 0 4px;
+            line-height: 1.4;
+        }
+
+        .quiz label {
+            display: block;
+            margin: 4px 0;
+            line-height: 1.4;
+            cursor: pointer;
+        }
+
+        .quiz label.inline {
+            display: inline-block;
+            margin-right: 14px;
+        }
+
+        .quiz textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            margin: 6px 0 8px;
+        }
+
+        .ch-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: #3198cf;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .feedback {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid;
+        }
+
+        .feedback.ok {
+            display: block;
+            background: #e3f4ea;
+            border-color: #b7e0c6;
+            color: #14532d;
+        }
+
+        .feedback.no {
+            display: block;
+            background: #fdecec;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .feedback ul {
+            padding-left: 20px;
+            margin: 6px 0;
+        }
+
+        .feedback p + p {
+            margin-top: 6px;
+        }
+
+        @media (max-width: 1100px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .challenges {
+                width: 100%;
+                position: static;
+                order: -1;
+            }
+        }
+
+        @media (max-width: 700px) {
+            header {
+                padding: 12px 16px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .sidebar ul {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .sidebar ul li {
+                flex: 1 1 50%;
+            }
+
+            .sidebar ul li button {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .form-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 6px;
+            }
+
+            .form-group label {
+                width: auto;
+            }
+
+            .form-group:has(input[type="checkbox"]) {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .form-group:has(input[type="checkbox"]) label {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -165,145 +512,271 @@
 
     <div class="container">
         <!-- Menu Lateral -->
-        <div class="sidebar">
+        <nav class="sidebar" aria-label="Menu do roteador">
             <ul>
-                <li onclick="showPanel('status')">Status</li>
-                <li onclick="showPanel('wifi24')" class="active" id="tab-wifi24">Wireless 2.4GHz</li>
-                <li onclick="showPanel('wifi5')" id="tab-wifi5">Wireless 5GHz</li>
-                <li onclick="showPanel('qos')" id="tab-qos">QoS</li>
-                <li onclick="showPanel('system')">Ferramentas do Sistema</li>
+                <li><button type="button" onclick="showPanel('inicio')" class="active" id="tab-inicio">Início</button></li>
+                <li><button type="button" onclick="showPanel('status')" id="tab-status">Status</button></li>
+                <li><button type="button" onclick="showPanel('wifi24')" id="tab-wifi24">Wireless 2.4GHz</button></li>
+                <li><button type="button" onclick="showPanel('wifi5')" id="tab-wifi5">Wireless 5GHz</button></li>
+                <li><button type="button" onclick="showPanel('qos')" id="tab-qos">QoS</button></li>
+                <li><button type="button" onclick="showPanel('system')" id="tab-system">Ferramentas do Sistema</button></li>
             </ul>
-        </div>
+        </nav>
 
         <!-- Conteúdo -->
         <div class="content">
-            <div id="alert-msg" class="alert" role="status" aria-live="polite"></div>
+            <main class="main">
+                <div id="alert-msg" class="alert" role="status" aria-live="polite"></div>
 
-            <!-- Painel Wireless 2.4GHz -->
-            <div id="wifi24" class="panel active">
-                <h2>Configurações Wireless - 2.4GHz</h2>
-                <div class="form-group">
-                    <label>Habilitar Rádio:</label>
-                    <input type="checkbox" checked> Habilitar
-                </div>
-                <div class="form-group">
-                    <label>Nome da Rede (SSID):</label>
-                    <input type="text" value="MinhaRede_2G">
-                </div>
-                <div class="form-group">
-                    <label>Canal:</label>
-                    <select>
-                        <option value="auto">Auto</option>
-                        <option value="1">1</option>
-                        <option value="6" selected>6</option>
-                        <option value="11">11</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Largura do Canal:</label>
-                    <select>
-                        <option value="auto">Auto</option>
-                        <option value="20">20MHz</option>
-                        <option value="40" selected>40MHz</option>
-                    </select>
-                </div>
-                <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
-            </div>
+                <!-- Painel de apresentação -->
+                <div id="inicio" class="panel active">
+                    <h2>Simulador educacional de roteador</h2>
+                    <p>Este projeto simula uma interface de configuração de roteador.
+                    As alterações são fictícias e executadas no navegador.</p>
 
-            <!-- Painel Wireless 5GHz -->
-            <div id="wifi5" class="panel">
-                <h2>Configurações Wireless - 5GHz</h2>
-                <div class="form-group">
-                    <label>Habilitar Rádio:</label>
-                    <input type="checkbox" checked> Habilitar
-                </div>
-                <div class="form-group">
-                    <label>Nome da Rede (SSID):</label>
-                    <input type="text" value="MinhaRede_5G">
-                </div>
-                <div class="form-group">
-                    <label>Canal:</label>
-                    <select>
-                        <option value="auto">Auto</option>
-                        <option value="36">36</option>
-                        <option value="40">40</option>
-                        <option value="44">44</option>
-                        <option value="149" selected>149</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Largura do Canal:</label>
-                    <select>
-                        <option value="auto">Auto</option>
-                        <option value="20">20MHz</option>
-                        <option value="40">40MHz</option>
-                        <option value="80" selected>80MHz</option>
-                    </select>
-                </div>
-                <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
-            </div>
+                    <h3>Objetivo</h3>
+                    <p>Compreender SSID, canais, largura de banda, segurança, QoS e ferramentas
+                    básicas de administração de rede.</p>
 
-            <!-- Painel QoS -->
-            <div id="qos" class="panel">
-                <h2>Configuração de QoS (Quality of Service)</h2>
-                <div class="form-group">
-                    <label>Habilitar QoS:</label>
-                    <input type="checkbox" id="enableQos" onclick="toggleQos()"> Habilitar Controle de Banda
+                    <h3>Para quem</h3>
+                    <p>Estudantes dos anos finais do Ensino Fundamental e do Ensino Médio (eixo Mundo Digital
+                    da BNCC Computação), cursos técnicos e oficinas de introdução a redes. Não precisa
+                    de conhecimento prévio além de saber o que é uma rede Wi-Fi.</p>
+
+                    <h3>Como usar</h3>
+                    <ol>
+                        <li>Leia o desafio no quadro <strong>Desafios</strong>.</li>
+                        <li>Navegue pelo menu do roteador, altere as configurações e clique em <strong>Salvar</strong> no painel.</li>
+                        <li>Clique em <strong>Verificar</strong> no desafio. O simulador confere o que foi salvo e explica o que está certo ou errado.</li>
+                        <li>Use a <strong>dica</strong> só se precisar.</li>
+                    </ol>
+
+                    <h3>Para o professor</h3>
+                    <p>São seis desafios em ordem de dificuldade, pensados para uma aula de 50 minutos
+                    (cerca de 5 a 8 minutos por desafio, mais a discussão final). O progresso fica salvo
+                    só neste navegador. Para recomeçar com uma turma nova, use <em>Recomeçar tudo</em>
+                    no fim do quadro de desafios. Os critérios de cada desafio estão descritos no
+                    <a href="https://github.com/pereirashouse/simulador-configura-o-roteador#desafios">README do projeto</a>.</p>
                 </div>
-                <div id="qosSettings" style="display: none;">
+
+                <!-- Painel Status -->
+                <div id="status" class="panel">
+                    <h2>Status do Roteador</h2>
+                    <div class="table-wrap">
+                        <table class="info">
+                            <tr><th>Firmware</th><td>3.16.9 Build 20260410 (simulado)</td></tr>
+                            <tr><th>Tempo ligado</th><td>12 dias, 04:31:07</td></tr>
+                            <tr><th>WAN</th><td>Conectado — IP 203.0.113.25 (endereço de documentação)</td></tr>
+                            <tr><th>Plano contratado</th><td>Fibra 100 Mbps de download / 20 Mbps de upload</td></tr>
+                            <tr><th>Clientes conectados</th><td>2,4 GHz: 14 &nbsp;|&nbsp; 5 GHz: 9</td></tr>
+                        </table>
+                    </div>
+
+                    <h3>Redes vizinhas detectadas (2,4 GHz)</h3>
+                    <p>Resultado da última varredura de rádio feita pelo roteador.</p>
+                    <div class="table-wrap">
+                        <table class="info">
+                            <tr><th>Canal</th><th>Redes vizinhas</th><th>Sinal mais forte</th></tr>
+                            <tr><td>1</td><td>5</td><td>-48 dBm (forte)</td></tr>
+                            <tr><td>6</td><td>4</td><td>-52 dBm (forte)</td></tr>
+                            <tr><td>11</td><td>1</td><td>-86 dBm (muito fraco)</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Painel Wireless 2.4GHz -->
+                <div id="wifi24" class="panel">
+                    <h2>Configurações Wireless - 2.4GHz</h2>
                     <div class="form-group">
-                        <label>Tipo de Linha:</label>
-                        <select>
-                            <option>ADSL</option>
-                            <option selected>Fibra/Cabo</option>
+                        <label for="w24-enable">Habilitar Rádio:</label>
+                        <input type="checkbox" id="w24-enable" checked> Habilitar
+                    </div>
+                    <div class="form-group">
+                        <label for="w24-ssid">Nome da Rede (SSID):</label>
+                        <input type="text" id="w24-ssid" value="MinhaRede_2G">
+                    </div>
+                    <div class="form-group">
+                        <label for="w24-channel">Canal:</label>
+                        <select id="w24-channel">
+                            <option value="auto">Auto</option>
+                            <option value="1">1</option>
+                            <option value="6" selected>6</option>
+                            <option value="11">11</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Banda de Upload (Kbps):</label>
-                        <input type="text" value="50000">
+                        <label for="w24-width">Largura do Canal:</label>
+                        <select id="w24-width">
+                            <option value="auto">Auto</option>
+                            <option value="20">20MHz</option>
+                            <option value="40" selected>40MHz</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>Banda de Download (Kbps):</label>
-                        <input type="text" value="200000">
+                        <label for="w24-power">Potência de Transmissão:</label>
+                        <select id="w24-power">
+                            <option value="baixa">Baixa</option>
+                            <option value="media" selected>Média</option>
+                            <option value="alta">Alta</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label for="w24-sec">Segurança:</label>
+                        <select id="w24-sec" onchange="togglePassword('w24')">
+                            <option value="open">Nenhuma (rede aberta)</option>
+                            <option value="wep" selected>WEP</option>
+                            <option value="wpa-tkip">WPA/WPA2-PSK (TKIP)</option>
+                            <option value="wpa2-aes">WPA2-PSK (AES)</option>
+                            <option value="wpa3">WPA3-SAE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="w24-pass">Senha (Wi-Fi):</label>
+                        <input type="text" id="w24-pass" value="12345678" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="w24-wps">WPS:</label>
+                        <input type="checkbox" id="w24-wps" checked> Habilitado
+                    </div>
+                    <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
                 </div>
-                <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
-            </div>
 
-            <!-- Painéis Genéricos para preenchimento de layout -->
-            <div id="status" class="panel">
-                <h2>Status do Roteador</h2>
-                <p>Aqui seriam exibidas as informações de firmware, uptime e status da WAN.</p>
-            </div>
-            <div id="system" class="panel">
-                <h2>Ferramentas do Sistema</h2>
-                <p>Opções de backup, atualização de firmware e log de eventos.</p>
-            </div>
+                <!-- Painel Wireless 5GHz -->
+                <div id="wifi5" class="panel">
+                    <h2>Configurações Wireless - 5GHz</h2>
+                    <div class="form-group">
+                        <label for="w5-enable">Habilitar Rádio:</label>
+                        <input type="checkbox" id="w5-enable" checked> Habilitar
+                    </div>
+                    <div class="form-group">
+                        <label for="w5-ssid">Nome da Rede (SSID):</label>
+                        <input type="text" id="w5-ssid" value="MinhaRede_5G">
+                    </div>
+                    <div class="form-group">
+                        <label for="w5-channel">Canal:</label>
+                        <select id="w5-channel">
+                            <option value="auto">Auto</option>
+                            <option value="36">36</option>
+                            <option value="40">40</option>
+                            <option value="44">44</option>
+                            <option value="149" selected>149</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="w5-width">Largura do Canal:</label>
+                        <select id="w5-width">
+                            <option value="auto">Auto</option>
+                            <option value="20">20MHz</option>
+                            <option value="40">40MHz</option>
+                            <option value="80" selected>80MHz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="w5-sec">Segurança:</label>
+                        <select id="w5-sec" onchange="togglePassword('w5')">
+                            <option value="open">Nenhuma (rede aberta)</option>
+                            <option value="wep">WEP</option>
+                            <option value="wpa-tkip">WPA/WPA2-PSK (TKIP)</option>
+                            <option value="wpa2-aes" selected>WPA2-PSK (AES)</option>
+                            <option value="wpa3">WPA3-SAE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="w5-pass">Senha (Wi-Fi):</label>
+                        <input type="text" id="w5-pass" value="Biblioteca-Cinza-Manga-42" autocomplete="off">
+                    </div>
+                    <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
+                </div>
 
+                <!-- Painel QoS -->
+                <div id="qos" class="panel">
+                    <h2>Configuração de QoS (Quality of Service)</h2>
+                    <div class="form-group">
+                        <label for="enableQos">Habilitar QoS:</label>
+                        <input type="checkbox" id="enableQos" onclick="toggleQos()"> Habilitar Controle de Banda
+                    </div>
+                    <div id="qosSettings" style="display: none;">
+                        <div class="form-group">
+                            <label for="qos-line">Tipo de Linha:</label>
+                            <select id="qos-line">
+                                <option>ADSL</option>
+                                <option selected>Fibra/Cabo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="qos-up">Banda de Upload (Kbps):</label>
+                            <input type="text" id="qos-up" value="50000">
+                        </div>
+                        <div class="form-group">
+                            <label for="qos-down">Banda de Download (Kbps):</label>
+                            <input type="text" id="qos-down" value="200000">
+                        </div>
+                        <div class="form-group">
+                            <label for="qos-prio">Prioridade Alta para:</label>
+                            <select id="qos-prio">
+                                <option value="nenhuma" selected>Nenhuma aplicação</option>
+                                <option value="web">Navegação web</option>
+                                <option value="video">Videochamadas e aulas on-line</option>
+                                <option value="jogos">Jogos on-line</option>
+                                <option value="downloads">Downloads e atualizações</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
+                </div>
+
+                <!-- Painel Ferramentas do Sistema -->
+                <div id="system" class="panel">
+                    <h2>Ferramentas do Sistema</h2>
+                    <p>Backup, atualização de firmware e reinicialização ficam desativados no simulador.</p>
+                    <h3>Log de eventos</h3>
+                    <pre class="log" tabindex="0" aria-label="Log de eventos do roteador">2026-10-20 07:58:02  INFO  DHCP: endereço 192.168.0.112 entregue a 3c:91:80:2a:11:07
+2026-10-20 07:58:40  INFO  WLAN 2.4G: 3c:91:80:2a:11:07 associado
+2026-10-20 08:14:05  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:09  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:12  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:16  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:19  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:23  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:26  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:30  WARN  WLAN 2.4G: falha de autenticação (senha incorreta) de a2:4f:9c:13:7e:01
+2026-10-20 08:14:41  INFO  WLAN 2.4G: a2:4f:9c:13:7e:01 associado
+2026-10-20 08:14:42  INFO  DHCP: endereço 192.168.0.131 entregue a a2:4f:9c:13:7e:01
+2026-10-20 08:15:03  INFO  WAN: conexão estável, latência 9 ms</pre>
+                </div>
+            </main>
+
+            <!-- Quadro de desafios -->
+            <aside class="challenges" aria-labelledby="ch-heading">
+                <h2 id="ch-heading">Desafios</h2>
+                <p class="progress-text" id="progress-text">0 de 6 concluídos</p>
+                <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+                <div class="ch-tabs" id="ch-tabs" role="group" aria-label="Escolher desafio"></div>
+                <div id="ch-card" aria-live="polite"></div>
+                <p style="margin-top:14px"><button type="button" class="link-btn" onclick="resetAll()">Recomeçar tudo</button></p>
+            </aside>
         </div>
     </div>
 
     <script>
+        // ------------------------------------------------------------ painéis do roteador
+
         // Função para alternar as abas
         function showPanel(panelId) {
             // Esconde todos os painéis
             document.querySelectorAll('.panel').forEach(panel => {
                 panel.classList.remove('active');
             });
-            
+
             // Remove classe ativa de todos os itens do menu
-            document.querySelectorAll('.sidebar ul li').forEach(li => {
-                li.classList.remove('active');
+            document.querySelectorAll('.sidebar ul li button').forEach(btn => {
+                btn.classList.remove('active');
             });
 
-            // Mostra o painel selecionado
+            // Mostra o painel selecionado e marca o item do menu
             document.getElementById(panelId).classList.add('active');
-            
-            // Se o item clicado tiver ID (para as abas principais), marca como ativo
-            if(document.getElementById('tab-' + panelId)) {
-                document.getElementById('tab-' + panelId).classList.add('active');
-            }
-            
+            document.getElementById('tab-' + panelId).classList.add('active');
+
             // Esconde alertas anteriores ao trocar de aba
             document.getElementById('alert-msg').style.display = 'none';
         }
@@ -315,28 +788,52 @@
             qosSettings.style.display = isEnabled ? 'block' : 'none';
         }
 
+        // Rede aberta não tem senha
+        function togglePassword(prefix) {
+            var open = document.getElementById(prefix + '-sec').value === 'open';
+            document.getElementById(prefix + '-pass').disabled = open;
+        }
+
         // Confere os campos de texto do painel antes de "salvar"
         function validatePanel(panel) {
             var inputs = panel.querySelectorAll('input[type="text"]');
             for (var i = 0; i < inputs.length; i++) {
                 var label = inputs[i].parentNode.querySelector('label').textContent.replace(':', '');
                 var value = inputs[i].value.trim();
-                if (inputs[i].offsetParent === null) continue; // campo oculto (QoS desligado)
+                if (inputs[i].offsetParent === null || inputs[i].disabled) continue; // campo oculto ou desativado
                 if (value === '') return 'Preencha o campo "' + label + '".';
                 if (label.indexOf('SSID') !== -1 && value.length > 32) return 'O SSID pode ter no máximo 32 caracteres.';
+                if (label.indexOf('Senha') !== -1 && (value.length < 8 || value.length > 63)) return 'A senha do Wi-Fi precisa ter de 8 a 63 caracteres.';
                 if (label.indexOf('Kbps') !== -1 && !/^[0-9]+$/.test(value)) return 'O campo "' + label + '" aceita apenas números inteiros.';
             }
             return null;
         }
 
+        // Lê os campos com id de um painel (o que está na tela agora)
+        function readPanel(panel) {
+            var values = {};
+            panel.querySelectorAll('input[id], select[id]').forEach(function(el) {
+                values[el.id] = el.type === 'checkbox' ? el.checked : el.value.trim();
+            });
+            return values;
+        }
+
+        // Configuração "gravada" no roteador: só muda quando o aluno clica em Salvar
+        var saved = {};
+        ['wifi24', 'wifi5', 'qos'].forEach(function(id) {
+            saved[id] = readPanel(document.getElementById(id));
+        });
+
         // Simula o salvamento: a mensagem só aparece depois de clicar em Salvar
         var alertTimer;
         function saveConfig(button) {
+            var panel = button.closest('.panel');
             var alertMsg = document.getElementById('alert-msg');
-            var error = validatePanel(button.closest('.panel'));
+            var error = validatePanel(panel);
             alertMsg.className = error ? 'alert error' : 'alert';
             alertMsg.textContent = error || 'Configurações aplicadas no simulador. Nenhum equipamento real foi alterado.';
             alertMsg.style.display = 'block';
+            if (!error) saved[panel.id] = readPanel(panel);
 
             clearTimeout(alertTimer);
             if (!error) {
@@ -346,6 +843,317 @@
                 }, 3000);
             }
         }
+
+        // Painéis alterados na tela mas ainda não salvos
+        function unsavedPanels(ids) {
+            return ids.filter(function(id) {
+                return JSON.stringify(readPanel(document.getElementById(id))) !== JSON.stringify(saved[id]);
+            });
+        }
+
+        var PANEL_NAMES = { wifi24: 'Wireless 2.4GHz', wifi5: 'Wireless 5GHz', qos: 'QoS' };
+
+        // ------------------------------------------------------------ desafios
+
+        var WEAK_PASSWORDS = ['12345678', '123456789', '1234567890', '87654321', 'password', 'senha123',
+                              'senha1234', 'qwerty123', 'admin123', 'abcd1234', 'minharede', '00000000', '11111111'];
+
+        function weakPassword(p) {
+            var low = p.toLowerCase();
+            if (p.length < 12) return 'tem menos de 12 caracteres';
+            if (WEAK_PASSWORDS.indexOf(low) !== -1) return 'está na lista das senhas mais usadas';
+            if (/^[0-9]+$/.test(p)) return 'tem só números';
+            if (/^(.)\1+$/.test(p)) return 'repete o mesmo caractere';
+            return null;
+        }
+
+        var SEC_NAMES = { open: 'rede aberta', wep: 'WEP', 'wpa-tkip': 'WPA/WPA2 com TKIP', 'wpa2-aes': 'WPA2-AES', wpa3: 'WPA3' };
+
+        function securityProblems(prefix, cfg, band) {
+            var problems = [];
+            var sec = cfg[prefix + '-sec'];
+            if (sec === 'open') problems.push('A rede ' + band + ' está <strong>aberta</strong>: qualquer pessoa por perto entra e o tráfego não é cifrado.');
+            if (sec === 'wep') problems.push('A rede ' + band + ' usa <strong>WEP</strong>, um padrão de 1999 que pode ser quebrado em poucos minutos com ferramentas gratuitas.');
+            if (sec === 'wpa-tkip') problems.push('A rede ' + band + ' usa <strong>TKIP</strong>, que é obsoleto. Escolha WPA2-PSK (AES) ou WPA3-SAE.');
+            if (sec !== 'open') {
+                var why = weakPassword(cfg[prefix + '-pass']);
+                if (why) problems.push('A senha da rede ' + band + ' é fraca: ' + why + '.');
+            }
+            if (prefix === 'w24' && cfg['w24-wps']) problems.push('O <strong>WPS</strong> está habilitado. O PIN do WPS tem falhas conhecidas e permite descobrir a senha sem conhecê-la.');
+            return problems;
+        }
+
+        var challenges = [
+            {
+                level: 'Nível 1 · Wireless',
+                title: 'Mais alcance na rede 2,4 GHz',
+                panels: ['wifi24'],
+                body: '<p>A sala de informática fica no fim do corredor e o sinal da rede <strong>2,4 GHz</strong> chega fraco lá. ' +
+                      'Ajuste a rede 2,4 GHz para priorizar <strong>alcance e estabilidade</strong> em vez de velocidade máxima.</p>' +
+                      '<p class="ch-where">Onde: <em>Wireless 2.4GHz</em>. Lembre de clicar em Salvar.</p>',
+                hint: 'Canais mais largos carregam mais dados, mas são mais sensíveis a ruído e, na 2,4 GHz, se sobrepõem aos vizinhos. ' +
+                      'Olhe também a potência de transmissão.',
+                check: function() {
+                    var c = saved.wifi24, errors = [];
+                    if (!c['w24-enable']) errors.push('O rádio 2,4 GHz está desligado. Sem rádio não há rede.');
+                    if (c['w24-width'] !== '20') errors.push('A largura do canal está em ' + (c['w24-width'] === 'auto' ? 'Auto' : c['w24-width'] + ' MHz') +
+                        '. Em 20 MHz o sinal é mais robusto a ruído e ocupa só um dos três canais livres da faixa.');
+                    if (c['w24-power'] !== 'alta') errors.push('A potência de transmissão está em ' + (c['w24-power'] === 'baixa' ? 'Baixa' : 'Média') + '. Para cobrir uma sala distante, use Alta.');
+                    return {
+                        ok: errors.length === 0, errors: errors,
+                        success: '<p>A faixa de 2,4 GHz já alcança mais longe que a de 5 GHz, porque ondas de frequência mais baixa atravessam melhor paredes. ' +
+                                 'Com <strong>20 MHz</strong> o sinal fica mais estável e com <strong>potência alta</strong> ele chega mais longe.</p>' +
+                                 '<p>No mundo real: em prédios com muitos access points, potência alta demais faz as APs interferirem entre si. ' +
+                                 'Aí a solução é instalar mais APs com potência menor, e não aumentar a potência de uma só.</p>'
+                    };
+                }
+            },
+            {
+                level: 'Nível 1 · Wireless',
+                title: 'Escolha o canal com menos interferência',
+                panels: ['wifi24'],
+                body: '<p>O roteador fez uma varredura e encontrou as redes vizinhas. Consulte a tabela no painel <em>Status</em> ' +
+                      'e escolha para a rede 2,4 GHz o canal que vai sofrer <strong>menos interferência</strong>.</p>' +
+                      '<p class="ch-where">Onde: <em>Status</em> para consultar, <em>Wireless 2.4GHz</em> para configurar.</p>',
+                hint: 'Na 2,4 GHz só os canais 1, 6 e 11 não se sobrepõem. Conte quantas redes estão em cada um e veja a força do sinal delas.',
+                check: function() {
+                    var c = saved.wifi24, errors = [];
+                    var ch = c['w24-channel'];
+                    if (ch === 'auto') errors.push('O canal está em Auto. O modo automático costuma funcionar, mas aqui o objetivo é você decidir a partir da varredura.');
+                    else if (ch === '1') errors.push('O canal 1 tem 5 redes vizinhas, a mais forte em -48 dBm. É o canal mais congestionado.');
+                    else if (ch === '6') errors.push('O canal 6 tem 4 redes vizinhas com sinal forte (-52 dBm). Ainda há bastante disputa.');
+                    if (c['w24-width'] === '40' || c['w24-width'] === 'auto') errors.push('A largura está em ' + (c['w24-width'] === 'auto' ? 'Auto' : '40 MHz') +
+                        '. Na 2,4 GHz um canal de 40 MHz invade os canais vizinhos e anula a vantagem de escolher o canal 11. Use 20 MHz.');
+                    return {
+                        ok: errors.length === 0, errors: errors,
+                        success: '<p>O <strong>canal 11</strong> tem só uma rede vizinha e com sinal muito fraco (-86 dBm), então quase não há disputa pelo ar. ' +
+                                 'No Wi-Fi, quem está no mesmo canal precisa esperar a vez de transmitir: menos vizinhos significa menos espera e menos colisão.</p>'
+                    };
+                }
+            },
+            {
+                level: 'Nível 2 · Conceitos',
+                title: '2,4 GHz ou 5 GHz?',
+                panels: [],
+                body: '<p>Para cada frase, marque a faixa que ela descreve. Depois explique com suas palavras a diferença entre as duas.</p>' +
+                      '<div class="quiz" id="quiz-bands"></div>',
+                hint: 'Pense em ondas de frequência mais baixa (2,4 GHz) e mais alta (5 GHz). Frequência mais alta perde força mais rápido ao atravessar obstáculos, ' +
+                      'mas a faixa de 5 GHz é muito mais larga e tem mais canais.',
+                render: function() {
+                    var items = [
+                        ['b1', 'Alcança mais longe e atravessa melhor paredes e lajes.', '24'],
+                        ['b2', 'Tem muito mais canais que não se sobrepõem.', '5'],
+                        ['b3', 'Sofre mais interferência de micro-ondas, Bluetooth e redes vizinhas.', '24'],
+                        ['b4', 'Oferece mais velocidade perto do roteador, por exemplo para vídeo em alta resolução.', '5'],
+                        ['b5', 'É a única faixa aceita por muitos aparelhos antigos e de IoT (lâmpadas, câmeras baratas).', '24']
+                    ];
+                    var html = items.map(function(it) {
+                        return '<fieldset><legend>' + it[1] + '</legend>' +
+                            '<label class="inline"><input type="radio" name="' + it[0] + '" value="24"> 2,4 GHz</label>' +
+                            '<label class="inline"><input type="radio" name="' + it[0] + '" value="5"> 5 GHz</label></fieldset>';
+                    }).join('');
+                    html += '<label for="bands-text"><strong>Explique a diferença com suas palavras:</strong></label>' +
+                            '<textarea id="bands-text" placeholder="Ex.: A 2,4 GHz... já a 5 GHz..."></textarea>';
+                    document.getElementById('quiz-bands').innerHTML = html;
+                    this.items = items;
+                },
+                check: function() {
+                    var errors = [];
+                    this.items.forEach(function(it) {
+                        var sel = document.querySelector('input[name="' + it[0] + '"]:checked');
+                        if (!sel) errors.push('Falta responder: "' + it[1] + '"');
+                        else if (sel.value !== it[2]) errors.push('"' + it[1] + '" descreve a faixa de ' + (it[2] === '24' ? '2,4 GHz' : '5 GHz') + '.');
+                    });
+                    var text = document.getElementById('bands-text').value.trim();
+                    if (text.length < 40) errors.push('Escreva sua explicação com pelo menos uma ou duas frases (40 caracteres ou mais).');
+                    return {
+                        ok: errors.length === 0, errors: errors,
+                        success: '<p>Compare sua explicação com esta resposta de referência:</p>' +
+                                 '<p><em>A faixa de 2,4 GHz alcança mais longe e atravessa melhor obstáculos, mas tem só três canais livres (1, 6 e 11), ' +
+                                 'é mais lenta e sofre mais interferência. A faixa de 5 GHz é mais rápida e tem muitos canais, mas o sinal perde força ' +
+                                 'mais rápido com distância e paredes. Por isso muitas redes usam as duas: 5 GHz perto do roteador e 2,4 GHz para longe ' +
+                                 'ou para aparelhos antigos.</em></p>'
+                    };
+                }
+            },
+            {
+                level: 'Nível 2 · Segurança',
+                title: 'Encontre a configuração insegura',
+                panels: ['wifi24', 'wifi5'],
+                body: '<p>Uma das redes deste roteador está configurada de um jeito que qualquer pessoa com um notebook e ferramentas gratuitas ' +
+                      'conseguiria invadir. <strong>Descubra o que está errado e corrija</strong>, sem deixar a outra rede insegura.</p>' +
+                      '<p class="ch-where">Onde: <em>Wireless 2.4GHz</em> e <em>Wireless 5GHz</em>.</p>',
+                hint: 'Confira três coisas em cada rede: o tipo de segurança (o mais antigo é o mais fraco), a senha e se há algum recurso de conexão "fácil" ligado.',
+                check: function() {
+                    var errors = securityProblems('w24', saved.wifi24, '2,4 GHz').concat(securityProblems('w5', saved.wifi5, '5 GHz'));
+                    var sec = SEC_NAMES[saved.wifi24['w24-sec']];
+                    return {
+                        ok: errors.length === 0, errors: errors,
+                        success: '<p>A rede 2,4 GHz tinha três problemas: <strong>WEP</strong>, senha <strong>12345678</strong> e <strong>WPS</strong> ligado. ' +
+                                 'Agora ela usa ' + sec + ', senha forte e WPS desligado.</p>' +
+                                 '<p>Uma boa senha de Wi-Fi é longa (12 caracteres ou mais) e fácil de lembrar, como várias palavras sem relação entre si. ' +
+                                 'Tamanho protege mais do que trocar letras por símbolos.</p>'
+                    };
+                }
+            },
+            {
+                level: 'Nível 3 · QoS',
+                title: 'Priorize as aulas on-line',
+                panels: ['qos'],
+                body: '<p>Durante as videochamadas com outra escola, a imagem trava sempre que alguém baixa um arquivo grande. ' +
+                      'Ative o <strong>QoS</strong>, informe a banda real do plano de internet e dê <strong>prioridade alta para videochamadas</strong>.</p>' +
+                      '<p class="ch-where">Onde: <em>Status</em> para ver o plano contratado, <em>QoS</em> para configurar.</p>',
+                hint: 'O QoS só funciona bem se souber a banda real do link. O plano está no painel Status em Mbps, e o roteador pede em Kbps (1 Mbps = 1000 Kbps). ' +
+                      'É comum informar um pouco menos que o contratado, entre 80% e 100%.',
+                check: function() {
+                    var c = saved.qos, errors = [];
+                    if (!c.enableQos) {
+                        errors.push('O QoS está desligado. Sem ele, todo tráfego disputa a banda de igual para igual.');
+                    } else {
+                        var up = parseInt(c['qos-up'], 10), down = parseInt(c['qos-down'], 10);
+                        if (!(down >= 80000 && down <= 100000)) errors.push('O download está em ' + c['qos-down'] + ' Kbps. O plano tem 100 Mbps = 100000 Kbps; ' +
+                            (down > 100000 ? 'informar mais do que o link aguenta faz o roteador achar que sobra banda, e o QoS não age.' : 'informe entre 80000 e 100000 Kbps.'));
+                        if (!(up >= 16000 && up <= 20000)) errors.push('O upload está em ' + c['qos-up'] + ' Kbps. O plano tem 20 Mbps = 20000 Kbps; ' +
+                            (up > 20000 ? 'na videochamada o upload é o que mais trava, e um valor acima do real impede o QoS de controlar a fila.' : 'informe entre 16000 e 20000 Kbps.'));
+                        if (c['qos-prio'] !== 'video') errors.push('A prioridade alta está em "' + document.querySelector('#qos-prio option[value="' + c['qos-prio'] + '"]').textContent +
+                            '". O problema é a videochamada, então ela precisa passar na frente.');
+                    }
+                    return {
+                        ok: errors.length === 0, errors: errors,
+                        success: '<p>Com o QoS ligado e a banda certa, o roteador sabe quando o link está cheio e passa os pacotes da videochamada na frente dos downloads. ' +
+                                 'O download não fica proibido: ele só espera quando a chamada precisa.</p>' +
+                                 '<p>Videochamada é sensível a <strong>atraso</strong> e <strong>variação de atraso</strong> (jitter); download é sensível só a volume. ' +
+                                 'Por isso faz sentido priorizar quem não pode esperar.</p>'
+                    };
+                }
+            },
+            {
+                level: 'Nível 3 · Diagnóstico',
+                title: 'Interprete o log de eventos',
+                panels: [],
+                body: '<p>Abra o <em>Log de eventos</em> em <em>Ferramentas do Sistema</em> e analise o que aconteceu entre 08:14 e 08:15. Responda às duas perguntas.</p>' +
+                      '<div class="quiz" id="quiz-log"></div>',
+                hint: 'Repare quem aparece nas linhas WARN, quantas vezes e com que intervalo. Depois veja o que acontece logo em seguida com o mesmo endereço MAC.',
+                render: function() {
+                    document.getElementById('quiz-log').innerHTML =
+                        '<fieldset><legend>1. O que o log mostra?</legend>' +
+                        '<label><input type="radio" name="log1" value="a"> O roteador está com defeito e desconectando todos.</label>' +
+                        '<label><input type="radio" name="log1" value="b"> Um aparelho tentou várias senhas erradas em sequência e depois conseguiu entrar.</label>' +
+                        '<label><input type="radio" name="log1" value="c"> A internet do provedor caiu.</label>' +
+                        '<label><input type="radio" name="log1" value="d"> O servidor DHCP ficou sem endereços.</label></fieldset>' +
+                        '<fieldset><legend>2. Qual é a melhor primeira atitude?</legend>' +
+                        '<label><input type="radio" name="log2" value="a"> Reiniciar o roteador e esperar.</label>' +
+                        '<label><input type="radio" name="log2" value="b"> Desligar a rede 5 GHz.</label>' +
+                        '<label><input type="radio" name="log2" value="c"> Identificar o aparelho a2:4f:9c:13:7e:01, trocar a senha do Wi-Fi por uma forte e usar WPA2-AES ou WPA3.</label>' +
+                        '<label><input type="radio" name="log2" value="d"> Aumentar a potência da rede 2,4 GHz.</label></fieldset>';
+                },
+                check: function() {
+                    var errors = [];
+                    var q1 = document.querySelector('input[name="log1"]:checked');
+                    var q2 = document.querySelector('input[name="log2"]:checked');
+                    var why1 = {
+                        a: 'Se o roteador estivesse com defeito, todos os aparelhos teriam problema. O log mostra um único MAC falhando.',
+                        c: 'A última linha mostra a WAN estável com 9 ms de latência: a internet não caiu.',
+                        d: 'O DHCP entregou endereço normalmente às 08:14:42, então não ficou sem endereços.'
+                    };
+                    var why2 = {
+                        a: 'Reiniciar não resolve: o aparelho já sabe a senha e volta a entrar.',
+                        b: 'As tentativas foram na rede 2,4 GHz; desligar a 5 GHz não muda nada.',
+                        d: 'Mais potência só faz a rede alcançar mais longe, inclusive quem está tentando invadir.'
+                    };
+                    if (!q1) errors.push('Responda à pergunta 1.');
+                    else if (q1.value !== 'b') errors.push('Pergunta 1: ' + why1[q1.value]);
+                    if (!q2) errors.push('Responda à pergunta 2.');
+                    else if (q2.value !== 'c') errors.push('Pergunta 2: ' + why2[q2.value]);
+                    return {
+                        ok: errors.length === 0, errors: errors,
+                        success: '<p>Oito falhas de senha do mesmo MAC, a cada 3 ou 4 segundos, seguidas de uma conexão bem-sucedida, é o padrão de alguém ' +
+                                 '<strong>tentando adivinhar a senha</strong> (força bruta ou lista de senhas comuns). Com uma senha como 12345678, isso funciona rápido.</p>' +
+                                 '<p>É assim que um técnico de rede trabalha: lê os eventos em ordem, procura o que se repete, descarta o que os próprios logs ' +
+                                 'mostram estar normal (WAN e DHCP) e só então decide o que fazer.</p>'
+                    };
+                }
+            }
+        ];
+
+        // Progresso salvo só neste navegador; a página funciona sem ele
+        var STORE_KEY = 'simulador-roteador-desafios';
+        var done = [];
+        try { done = JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch (e) { done = []; }
+        var current = 0;
+        for (var i = 0; i < challenges.length; i++) { if (done.indexOf(i) === -1) { current = i; break; } }
+
+        function persist() {
+            try { localStorage.setItem(STORE_KEY, JSON.stringify(done)); } catch (e) { /* sem armazenamento */ }
+        }
+
+        function renderTabs() {
+            var tabs = document.getElementById('ch-tabs');
+            tabs.innerHTML = '';
+            challenges.forEach(function(ch, i) {
+                var b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = done.indexOf(i) !== -1 ? '✓' : String(i + 1);
+                b.className = (i === current ? 'current ' : '') + (done.indexOf(i) !== -1 ? 'done' : '');
+                b.setAttribute('aria-label', 'Desafio ' + (i + 1) + ': ' + ch.title + (done.indexOf(i) !== -1 ? ' (concluído)' : ''));
+                if (i === current) b.setAttribute('aria-current', 'step');
+                b.onclick = function() { current = i; render(); };
+                tabs.appendChild(b);
+            });
+            var n = done.length;
+            document.getElementById('progress-text').textContent = n + ' de ' + challenges.length + ' concluídos';
+            document.getElementById('progress-bar').style.width = (100 * n / challenges.length) + '%';
+        }
+
+        function render() {
+            var ch = challenges[current];
+            document.getElementById('ch-card').innerHTML =
+                '<div class="ch-level">Desafio ' + (current + 1) + ' de ' + challenges.length + ' · ' + ch.level + '</div>' +
+                '<h3 class="ch-title">' + ch.title + '</h3>' +
+                '<div class="ch-body">' + ch.body + '</div>' +
+                '<details class="hint"><summary>Ver dica</summary><p>' + ch.hint + '</p></details>' +
+                '<div class="ch-actions"><button type="button" class="check-btn" onclick="verify()">Verificar</button></div>' +
+                '<div class="feedback" id="feedback"></div>';
+            if (ch.render) ch.render();
+            renderTabs();
+        }
+
+        function verify() {
+            var ch = challenges[current];
+            var result = ch.check();
+            var fb = document.getElementById('feedback');
+            var pending = unsavedPanels(ch.panels).map(function(id) { return PANEL_NAMES[id]; });
+            var note = pending.length ? '<p><strong>Atenção:</strong> há alterações não salvas em ' + pending.join(' e ') +
+                '. O simulador confere só o que foi salvo.</p>' : '';
+
+            if (result.ok) {
+                if (done.indexOf(current) === -1) { done.push(current); persist(); }
+                var next = challenges.findIndex(function(_, i) { return done.indexOf(i) === -1; });
+                fb.className = 'feedback ok';
+                fb.innerHTML = '<p><strong>Certo!</strong></p>' + result.success + note +
+                    (next !== -1 ? '<div class="ch-actions"><button type="button" class="check-btn" onclick="goTo(' + next + ')">Próximo desafio</button></div>'
+                                 : '<p><strong>Você concluiu todos os desafios.</strong></p>');
+                renderTabs();
+            } else {
+                fb.className = 'feedback no';
+                fb.innerHTML = '<p><strong>Ainda não.</strong> Veja o que falta:</p><ul><li>' + result.errors.join('</li><li>') + '</li></ul>' + note;
+            }
+        }
+
+        function goTo(i) {
+            current = i;
+            render();
+            document.getElementById('ch-heading').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function resetAll() {
+            if (!confirm('Apagar o progresso e voltar às configurações iniciais?')) return;
+            done = [];
+            persist();
+            location.reload();
+        }
+
+        render();
     </script>
 </body>
 </html>
