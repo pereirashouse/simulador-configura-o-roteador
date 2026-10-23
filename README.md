@@ -56,7 +56,7 @@ Cada resposta errada tem um feedback próprio. Exemplos: escolher o canal 1 most
 
 **Avaliação:** o próprio simulador indica a conclusão de cada desafio. Para avaliação formativa, peça a explicação do desafio 3 e uma frase sobre a decisão tomada no desafio 6.
 
-**Acessibilidade:** menu e desafios navegáveis por teclado, campos com rótulo, mensagens anunciadas a leitores de tela (`aria-live`) e layout adaptado para celular.
+**Acessibilidade:** há atalhos para configurações/desafios, foco visível, estado ativo dos painéis identificado, mensagens em região estável e erros associados ao campo que recebe foco. Os botões de desafio preservam o foco; **Próximo desafio** leva ao novo título. Confirmações não desaparecem em três segundos. A revisão também reforçou contraste, relações das tabelas, tela de 320 px e preferência de movimento reduzido. Esses recursos foram implementados para apoiar tecnologias assistivas; sua presença não equivale a validação com leitores de tela ou conformidade integral de WCAG.
 
 ## Como executar
 
@@ -79,7 +79,7 @@ A suíte em `tests/interface.spec.cjs` usa Playwright e Chromium real, em dois c
 
 Os testes não preenchem variáveis internas como `saved`, `done` ou resultados de `check()`: o percurso interage com os controles reais. A leitura do armazenamento verifica apenas a marcação produzida pela interface. As únicas falhas induzidas são no armazenamento local para exercitar os tratamentos existentes.
 
-Com **Node.js 22 ou superior** e **pnpm 11.25.0** disponíveis, execute na pasta do repositório:
+Com **Node.js 22.13 ou superior** e **pnpm 11.25.0** disponíveis, execute na pasta do repositório:
 
 ```bash
 pnpm install --frozen-lockfile
@@ -91,7 +91,15 @@ A primeira instalação de dependências/Chromium precisa de internet. Se faltar
 
 O relatório HTML fica em `playwright-report/` e pode ser aberto com `pnpm test:report`. Rastros e capturas são gerados apenas quando um teste falha; dependências e resultados locais ficam fora do Git. O [workflow de interface](https://github.com/pereirashouse/simulador-configura-o-roteador/actions/workflows/testes-interface.yml) executa a suíte em pushes/PRs da `main`, com lockfile, ações fixadas por commit, duas telas e **zero retentativas**. Os artefatos do relatório ficam disponíveis por sete dias. Consulte a execução e seu commit para a evidência atual; um workflow configurado não é, sozinho, um resultado aprovado.
 
-**Limites:** Chromium e telas emuladas não equivalem a Safari/Firefox, aparelhos físicos ou leitores de tela. A ativação básica por teclado não é auditoria de acessibilidade, contraste ou WCAG. O teste do texto livre confirma o limite atual de 40 caracteres, não sua qualidade semântica. A suíte exercita o artefato local, não disponibilidade do GitHub Pages, funcionamento de equipamentos ou aprendizagem em turma. O código da atividade não precisa ser recompilado nem empacotado para continuar funcionando offline.
+### Revisão delimitada de acessibilidade
+
+`tests/acessibilidade.spec.cjs` usa axe-core e regressões de teclado/foco nas duas telas Chromium do mesmo CI. A análise automática examina os seis painéis, os campos de QoS habilitados, os seis desafios com dicas abertas/feedback de erro e o feedback de acerto do primeiro desafio. Os testes adicionais conferem atalhos, foco preservado, identificação do painel ativo, associação de erro ao campo, mensagem persistente, foco no próximo título, tela de 320 px e movimento reduzido.
+
+Cada análise axe anexa ao relatório JSON com `violations` e `incomplete`. Os itens inconclusivos continuam disponíveis para avaliação humana; não são apresentados como aprovados. Para repetir apenas esta suíte, execute `pnpm exec playwright test tests/acessibilidade.spec.cjs`.
+
+Critérios consultados: [WCAG 2.2 — contraste, teclado e foco](https://www.w3.org/TR/WCAG22/) e [mensagens de status — 4.1.3](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html). O contraste inicial falhou na paleta azul clara; ela foi substituída por tons mais escuros. A perda de foco observada ao reconstruir os botões de desafio foi corrigida preservando seus nós.
+
+**Limites:** a revisão é delimitada aos estados e regras exercitados, não certificação WCAG. Chromium e telas emuladas não equivalem a Safari/Firefox, aparelhos físicos, NVDA/JAWS/VoiceOver ou testes com pessoas com deficiência. O texto livre continua sem avaliação semântica. A suíte exercita o artefato local, não disponibilidade do GitHub Pages, funcionamento de equipamentos ou aprendizagem em turma. O código da atividade não precisa ser recompilado nem empacotado para continuar funcionando offline.
 
 ## Limitações
 

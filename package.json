@@ -5,7 +5,7 @@
   "description": "Testes de interface do simulador educacional, sem dependências em tempo de uso.",
   "packageManager": "pnpm@11.25.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "scripts": {
     "test": "playwright test",
@@ -13,6 +13,7 @@
     "test:report": "playwright show-report"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@playwright/test": "1.64.1"
   }
 }
