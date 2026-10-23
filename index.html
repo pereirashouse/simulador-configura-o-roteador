@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TP-Link - Simulador de Configuração</title>
+    <title>Simulador educacional de configuração de roteador</title>
     <style>
         * {
             margin: 0;
@@ -133,14 +133,35 @@
             border-radius: 4px;
             margin-bottom: 20px;
         }
+
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        /* Aviso de simulador */
+        .sim-notice {
+            background-color: #fff3cd;
+            color: #664d03;
+            border-bottom: 1px solid #ffe69c;
+            padding: 10px 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>TP-Link</h1>
-        <div>admin | Sair</div>
+        <div>Modo simulação</div>
     </header>
+
+    <div class="sim-notice" role="note">
+        <strong>Simulador educacional — não é um roteador real.</strong>
+        As configurações são fictícias e executadas somente no navegador.
+    </div>
 
     <div class="container">
         <!-- Menu Lateral -->
@@ -156,7 +177,7 @@
 
         <!-- Conteúdo -->
         <div class="content">
-            <div id="alert-msg" class="alert">Configurações salvas com sucesso!</div>
+            <div id="alert-msg" class="alert" role="status" aria-live="polite"></div>
 
             <!-- Painel Wireless 2.4GHz -->
             <div id="wifi24" class="panel active">
@@ -186,7 +207,7 @@
                         <option value="40" selected>40MHz</option>
                     </select>
                 </div>
-                <button class="save-btn" onclick="saveConfig()">Salvar</button>
+                <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
             </div>
 
             <!-- Painel Wireless 5GHz -->
@@ -219,7 +240,7 @@
                         <option value="80" selected>80MHz</option>
                     </select>
                 </div>
-                <button class="save-btn" onclick="saveConfig()">Salvar</button>
+                <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
             </div>
 
             <!-- Painel QoS -->
@@ -246,7 +267,7 @@
                         <input type="text" value="200000">
                     </div>
                 </div>
-                <button class="save-btn" onclick="saveConfig()">Salvar</button>
+                <button class="save-btn" onclick="saveConfig(this)">Salvar</button>
             </div>
 
             <!-- Painéis Genéricos para preenchimento de layout -->
@@ -294,15 +315,36 @@
             qosSettings.style.display = isEnabled ? 'block' : 'none';
         }
 
-        // Simula o salvamento das configurações
-        function saveConfig() {
+        // Confere os campos de texto do painel antes de "salvar"
+        function validatePanel(panel) {
+            var inputs = panel.querySelectorAll('input[type="text"]');
+            for (var i = 0; i < inputs.length; i++) {
+                var label = inputs[i].parentNode.querySelector('label').textContent.replace(':', '');
+                var value = inputs[i].value.trim();
+                if (inputs[i].offsetParent === null) continue; // campo oculto (QoS desligado)
+                if (value === '') return 'Preencha o campo "' + label + '".';
+                if (label.indexOf('SSID') !== -1 && value.length > 32) return 'O SSID pode ter no máximo 32 caracteres.';
+                if (label.indexOf('Kbps') !== -1 && !/^[0-9]+$/.test(value)) return 'O campo "' + label + '" aceita apenas números inteiros.';
+            }
+            return null;
+        }
+
+        // Simula o salvamento: a mensagem só aparece depois de clicar em Salvar
+        var alertTimer;
+        function saveConfig(button) {
             var alertMsg = document.getElementById('alert-msg');
+            var error = validatePanel(button.closest('.panel'));
+            alertMsg.className = error ? 'alert error' : 'alert';
+            alertMsg.textContent = error || 'Configurações aplicadas no simulador. Nenhum equipamento real foi alterado.';
             alertMsg.style.display = 'block';
-            
-            // Oculta a mensagem após 3 segundos
-            setTimeout(function() {
-                alertMsg.style.display = 'none';
-            }, 3000);
+
+            clearTimeout(alertTimer);
+            if (!error) {
+                // Oculta a mensagem de sucesso após 3 segundos
+                alertTimer = setTimeout(function() {
+                    alertMsg.style.display = 'none';
+                }, 3000);
+            }
         }
     </script>
 </body>
